@@ -30,6 +30,7 @@
 !/tmp/storage/.keep
 
 /data/*
+!/data/symbols_valid_meta.csv
 
 /public/assets
 
