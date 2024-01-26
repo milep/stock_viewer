@@ -1,24 +1,27 @@
-# app/controllers/stock_prices_controller.rb
 class StockPricesController < ApplicationController
   def index
-    start_date = params[:start_date]
-    end_date = params[:end_date]
-    ticker_symbol = params[:ticker_symbol]
+    start_date = stock_price_params[:start_date].to_date
+    end_date = stock_price_params[:end_date].to_date if stock_price_params[:end_date].present?
+    ticker_symbol = stock_price_params[:ticker_symbol]
 
+    # As default show one day of data
+    end_date = start_date + 1.day unless end_date.present?
     # Limit the amount of data to return.
-    if start_date.present? && end_date.present?
-      start_date = start_date.to_date
-      end_date = end_date.to_date
-      if end_date > start_date + 1.month
-        end_date = start_date + 1.month
-      end
-    end
+    end_date = [end_date, start_date + 1.month].min if end_date > start_date + 1.month
 
-    @stock_prices = StockPrice.all
-    @stock_prices = @stock_prices.where("timestamp >= ?", start_date) if start_date.present?
-    @stock_prices = @stock_prices.where("timestamp <= ?", end_date) if end_date.present?
-    @stock_prices = @stock_prices.where(ticker_symbol: ticker_symbol) if ticker_symbol.present?
+    stock_prices = StockPrice.all
+    stock_prices = stock_prices.where("timestamp >= ?", start_date)
+    stock_prices = stock_prices.where("timestamp <= ?", end_date) if end_date.present?
+    stock_prices = stock_prices.where(ticker_symbol: ticker_symbol)
 
-    render(json: @stock_prices)
+    render(json: stock_prices)
+  end
+
+  private
+
+  def stock_price_params
+    params.require(:start_date)
+    params.require(:ticker_symbol)
+    params.permit(:start_date, :end_date, :ticker_symbol)
   end
 end
