@@ -1,0 +1,13 @@
+inherit_gem:
+  rubocop-shopify: rubocop.yml
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/ClassMethodsDefinitions:
+  Enabled: false
+
+AllCops:
+  NewCops: enable
+  Exclude:
+    - db/**/*
